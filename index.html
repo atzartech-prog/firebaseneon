@@ -55,6 +55,7 @@
                     <li>Klik ikon roda gigi ⚙️ > **Project settings**.</li>
                     <li>Di bagian bawah, buat aplikasi Web baru (klik ikon `</>`).</li>
                     <li>Salin objek JSON konfigurasi `firebaseConfig` dan tempel di atas!</li>
+                    <li>Aktifkan metode masuk **Email/Password** dan **Google** di menu **Authentication > Sign-in method** di console Firebase Anda agar login berfungsi.</li>
                 </ol>
             </div>
         </section>
@@ -71,39 +72,78 @@
                     </div>
                 </div>
                 <div class="actions">
+                    <!-- User Auth Profile Info -->
+                    <div id="user-profile-area" class="user-profile-area hidden">
+                        <span class="user-name" id="user-display-name">Pengguna</span>
+                        <button type="button" class="btn-icon" id="btn-logout" title="Keluar / Logout">
+                            <i class="bi bi-box-arrow-right"></i>
+                        </button>
+                    </div>
+                    <!-- Login Trigger Button -->
+                    <button type="button" class="btn btn-secondary btn-sm" id="btn-login-trigger">
+                        <i class="bi bi-box-arrow-in-right"></i> Masuk
+                    </button>
+                    
                     <button type="button" class="btn-icon" id="btn-change-config" title="Ubah Konfigurasi Firebase">
                         <i class="bi bi-gear"></i>
                     </button>
                 </div>
             </header>
 
-            <!-- New Message Form -->
-            <form id="msg-form" class="msg-input-panel">
-                <div class="input-row">
-                    <div class="input-field name-field">
-                        <label for="msg-name"><i class="bi bi-person-fill"></i> Nama Panggilan</label>
-                        <input type="text" id="msg-name" required placeholder="Siapa Anda?" autocomplete="off" maxlength="15">
-                    </div>
-                    <div class="input-field color-field">
-                        <label>Warna Memo</label>
-                        <div class="color-options">
-                            <label class="color-lbl color-blue"><input type="radio" name="msg-color" value="blue" checked></label>
-                            <label class="color-lbl color-pink"><input type="radio" name="msg-color" value="pink"></label>
-                            <label class="color-lbl color-orange"><input type="radio" name="msg-color" value="orange"></label>
-                            <label class="color-lbl color-green"><input type="radio" name="msg-color" value="green"></label>
-                        </div>
-                    </div>
-                </div>
-                <div class="input-field msg-field">
-                    <label for="msg-text"><i class="bi bi-chat-left-dots-fill"></i> Isi Memo</label>
-                    <div class="textarea-wrapper">
-                        <textarea id="msg-text" required rows="3" placeholder="Tulis memo, ucapan, atau ide Anda di papan ini..." maxlength="180"></textarea>
-                        <button type="submit" class="btn-send" title="Tempel Memo">
-                            <i class="bi bi-pin-angle-fill"></i> Tempel
+            <!-- New Message Form Container with Lock Overlay -->
+            <div id="msg-form-container" class="msg-form-container">
+                <!-- Locked Overlay for Unauthenticated Users -->
+                <div id="auth-lock-overlay" class="auth-lock-overlay">
+                    <div class="lock-content">
+                        <i class="bi bi-lock-fill lock-icon"></i>
+                        <h4>Silakan Masuk Untuk Menulis Memo</h4>
+                        <p>Anda harus masuk menggunakan akun Firebase Anda untuk memposting memo di papan pengumuman.</p>
+                        <button type="button" class="btn btn-primary" id="btn-lock-login">
+                            <i class="bi bi-box-arrow-in-right"></i> Masuk Sekarang
                         </button>
                     </div>
                 </div>
-            </form>
+
+                <form id="msg-form" class="msg-input-panel">
+                    <div class="input-row">
+                        <div class="input-field name-field">
+                            <label for="msg-name"><i class="bi bi-person-fill"></i> Nama Panggilan</label>
+                            <input type="text" id="msg-name" required placeholder="Siapa Anda?" autocomplete="off" maxlength="15">
+                        </div>
+                        <div class="input-field color-field">
+                            <label>Warna Memo</label>
+                            <div class="color-options">
+                                <label class="color-lbl color-blue"><input type="radio" name="msg-color" value="blue" checked></label>
+                                <label class="color-lbl color-pink"><input type="radio" name="msg-color" value="pink"></label>
+                                <label class="color-lbl color-orange"><input type="radio" name="msg-color" value="orange"></label>
+                                <label class="color-lbl color-green"><input type="radio" name="msg-color" value="green"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-field msg-field">
+                        <label><i class="bi bi-chat-left-dots-fill"></i> Isi Memo (WYSIWYG Editor)</label>
+                        <div class="wysiwyg-container">
+                            <div class="wysiwyg-toolbar">
+                                <button type="button" class="tb-btn" data-cmd="bold" title="Tebal (Ctrl+B)"><i class="bi bi-type-bold"></i></button>
+                                <button type="button" class="tb-btn" data-cmd="italic" title="Miring (Ctrl+I)"><i class="bi bi-type-italic"></i></button>
+                                <button type="button" class="tb-btn" data-cmd="underline" title="Garis Bawah (Ctrl+U)"><i class="bi bi-type-underline"></i></button>
+                                <button type="button" class="tb-btn" data-cmd="strikeThrough" title="Coret"><i class="bi bi-type-strikethrough"></i></button>
+                                <span class="tb-divider"></span>
+                                <button type="button" class="tb-btn" data-cmd="insertUnorderedList" title="Daftar Bulat"><i class="bi bi-list-ul"></i></button>
+                                <button type="button" class="tb-btn" data-cmd="insertOrderedList" title="Daftar Angka"><i class="bi bi-list-ol"></i></button>
+                                <span class="tb-divider"></span>
+                                <button type="button" class="tb-btn" data-cmd="removeFormat" title="Hapus Format"><i class="bi bi-eraser-fill"></i></button>
+                            </div>
+                            <div class="textarea-wrapper">
+                                <div id="msg-text" class="wysiwyg-editor" contenteditable="true" placeholder="Tulis memo, ucapan, atau ide Anda di papan ini..." required></div>
+                                <button type="submit" class="btn-send" title="Tempel Memo">
+                                    <i class="bi bi-pin-angle-fill"></i> Tempel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
 
             <!-- Board Title Grid -->
             <div class="memo-grid-header">
@@ -121,6 +161,46 @@
                 </div>
             </div>
         </section>
+    </div>
+
+    <!-- ================= AUTH MODAL ================= -->
+    <div id="auth-modal" class="modal-overlay hidden">
+        <div class="modal-card glass-panel animate-zoom">
+            <div class="modal-header">
+                <h3><i class="bi bi-shield-lock-fill"></i> <span id="auth-title">Masuk ke NeonBoard</span></h3>
+                <button type="button" class="btn-close-modal" id="btn-close-auth"><i class="bi bi-x-lg"></i></button>
+            </div>
+            
+            <form id="auth-form">
+                <div class="input-group">
+                    <label for="auth-email">Email</label>
+                    <input type="email" id="auth-email" required placeholder="nama@email.com" autocomplete="email">
+                </div>
+                <div class="input-group" style="margin-top: 15px;">
+                    <label for="auth-password">Password</label>
+                    <input type="password" id="auth-password" required placeholder="••••••••" autocomplete="current-password">
+                </div>
+                
+                <div id="auth-error-msg" class="auth-error hidden"></div>
+                
+                <button type="submit" class="btn btn-primary btn-full" id="btn-auth-submit" style="margin-top: 24px;">
+                    <i class="bi bi-box-arrow-in-right"></i> <span id="auth-submit-text">Masuk</span>
+                </button>
+            </form>
+            
+            <div class="auth-divider">
+                <span>atau</span>
+            </div>
+            
+            <button type="button" class="btn btn-google btn-full" id="btn-google-auth">
+                <i class="bi bi-google"></i> Masuk dengan Google
+            </button>
+            
+            <div class="auth-toggle">
+                <span id="auth-toggle-text">Belum punya akun?</span> 
+                <a href="#" id="auth-toggle-link">Daftar Sekarang</a>
+            </div>
+        </div>
     </div>
 
     <!-- Firebase App & Firestore SDK Module Script -->
