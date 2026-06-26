@@ -34,6 +34,7 @@ let app = null;
 let db = null;
 let auth = null;
 let unsubscribeRealtime = null;
+let authMode = 'register';
 
 // ================= DOM ELEMENTS =================
 const setupPanel = document.getElementById('setup-panel');
@@ -311,24 +312,31 @@ function setupAuthListeners() {
     });
 
     // Toggle Registration / Login Mode inside Modal
-    let authMode = 'login';
     authToggleLink.addEventListener('click', (e) => {
         e.preventDefault();
         authErrorMsg.classList.add('hidden');
         authForm.reset();
         
-        if (authMode === 'login') {
-            authMode = 'register';
-            authTitle.textContent = 'Daftar Akun Baru';
-            authSubmitText.textContent = 'Daftar';
-            authToggleText.textContent = 'Sudah punya akun?';
-            authToggleLink.textContent = 'Masuk Sekarang';
-        } else {
+        if (authMode === 'register') {
             authMode = 'login';
             authTitle.textContent = 'Masuk ke NeonBoard';
             authSubmitText.textContent = 'Masuk';
+            const icon = btnAuthSubmit.querySelector('i');
+            if (icon) {
+                icon.className = 'bi bi-box-arrow-in-right';
+            }
             authToggleText.textContent = 'Belum punya akun?';
             authToggleLink.textContent = 'Daftar Sekarang';
+        } else {
+            authMode = 'register';
+            authTitle.textContent = 'Daftar Akun Baru';
+            authSubmitText.textContent = 'Daftar';
+            const icon = btnAuthSubmit.querySelector('i');
+            if (icon) {
+                icon.className = 'bi bi-person-plus-fill';
+            }
+            authToggleText.textContent = 'Sudah punya akun?';
+            authToggleLink.textContent = 'Masuk Sekarang';
         }
     });
 
@@ -390,6 +398,16 @@ function setupAuthListeners() {
 }
 
 function openAuthModal() {
+    authMode = 'register';
+    authTitle.textContent = 'Daftar Akun Baru';
+    authSubmitText.textContent = 'Daftar';
+    const icon = btnAuthSubmit.querySelector('i');
+    if (icon) {
+        icon.className = 'bi bi-person-plus-fill';
+    }
+    authToggleText.textContent = 'Sudah punya akun?';
+    authToggleLink.textContent = 'Masuk Sekarang';
+    
     authModal.classList.remove('hidden');
     authEmail.focus();
 }
