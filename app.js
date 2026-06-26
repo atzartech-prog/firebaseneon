@@ -11,6 +11,15 @@ import {
 } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 
 // ================= GLOBAL STATE =================
+const defaultFirebaseConfig = {
+  apiKey: "AIzaSyClqA4vJVLPF2Em2s1HlIpxnCM_-z0yv38",
+  authDomain: "neonboard-app.firebaseapp.com",
+  projectId: "neonboard-app",
+  storageBucket: "neonboard-app.firebasestorage.app",
+  messagingSenderId: "416653669898",
+  appId: "1:416653669898:web:63a6b916975b37fd9251f3"
+};
+
 let firebaseConfig = null;
 let app = null;
 let db = null;
@@ -40,10 +49,10 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (e) {
             console.error('Failed to parse saved Firebase configuration:', e);
             localStorage.removeItem('fb_config');
-            showSection('setup');
+            useDefaultConfig();
         }
     } else {
-        showSection('setup');
+        useDefaultConfig();
     }
 
     // Attach Listeners
@@ -51,6 +60,12 @@ document.addEventListener('DOMContentLoaded', () => {
     btnChangeConfig.addEventListener('click', handleEditConfig);
     msgForm.addEventListener('submit', handleAddMemo);
 });
+
+function useDefaultConfig() {
+    firebaseConfig = defaultFirebaseConfig;
+    showSection('board');
+    initFirebase(firebaseConfig);
+}
 
 function showSection(section) {
     if (section === 'setup') {
